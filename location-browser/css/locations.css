@@ -1,0 +1,16 @@
+body {
+  padding-top: 40px;
+}
+
+#map {
+  height: 90vh; /** definitive height is set with js */
+}
+
+#filter {
+  padding-top: 30px;
+}
+
+table.dataTable thead th,
+.dataTables_wrapper.no-footer .dataTables_scrollBody {
+  border-bottom: none;
+}
