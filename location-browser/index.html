@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Institution Browser</title>
+    <title>Location Browser</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -26,7 +26,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Project name</a>
+          <a class="brand" href="#">Location Browser</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
@@ -38,71 +38,47 @@
       </div>
     </div>
 
-<!--
-    <div class="container">
--->
+    <div class="row">
+      <div class="span6">
 
-      <div class="row">
-        <div class="span6">
-          
-          <form id="filter">
-            <fieldset>
-              <!--
-              <label>Keyword</label>
-              -->
-              <input class="keyword" type="text" placeholder="Search…">
-              <!--
-              <span class="help-block">Example block-level help text here.</span>
-              -->
-            </fieldset>
+        <form id="filter">
+          <fieldset>
             <!--
-            <fieldset>
-              <button type="submit" class="btn">Search</button>
-            </fieldset>
+            <label>Keyword</label>
             -->
-          </form>
-          
-          <table id="locations" class="display" cellspacing="0" width="100%">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
+            <input class="keyword" type="text" placeholder="Search…">
+            <!--
+            <span class="help-block">Example block-level help text here.</span>
+            -->
+          </fieldset>
+          <!--
+          <fieldset>
+            <button type="submit" class="btn">Search</button>
+          </fieldset>
+          -->
+        </form>
 
-        <div class="map-wrapper">
-            <div id="map"></div>
-        </div>
+        <table id="locations" class="display" cellspacing="0" width="100%">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+            </tr>
+          </thead>
+        </table>
       </div>
-<!--
-    </div>  /container 
--->
 
-    <!-- Le javascript
-    ================================================== -->
+      <div class="map-wrapper">
+          <div id="map"></div>
+      </div>
+    </div>
+
+    <!-- Placed at the end of the document so the pages load faster -->
     <script src="js/jquery-1.11.3.min.js"></script>
     <script src="js/jquery.dataTables.min.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/locations.js"></script>
     
-
-    <!-- Placed at the end of the document so the pages load faster 
-    <script src="../assets/js/jquery.js"></script>
-    <script src="../assets/js/bootstrap-transition.js"></script>
-    <script src="../assets/js/bootstrap-alert.js"></script>
-    <script src="../assets/js/bootstrap-modal.js"></script>
-    <script src="../assets/js/bootstrap-dropdown.js"></script>
-    <script src="../assets/js/bootstrap-scrollspy.js"></script>
-    <script src="../assets/js/bootstrap-tab.js"></script>
-    <script src="../assets/js/bootstrap-tooltip.js"></script>
-    <script src="../assets/js/bootstrap-popover.js"></script>
-    <script src="../assets/js/bootstrap-button.js"></script>
-    <script src="../assets/js/bootstrap-collapse.js"></script>
-    <script src="../assets/js/bootstrap-carousel.js"></script>
-    <script src="../assets/js/bootstrap-typeahead.js"></script>
--->
   </body>
 </html>
