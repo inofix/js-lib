@@ -117,9 +117,9 @@ $(document).ready(function () {
   var locations = [];
   var locationLayer = L.featureGroup([]);
   var map = L.map("map", {
-    maxZoom: 15, 
+    // maxZoom: 15, 
     center: [0, 0],
-    maxZoom: 13,
+    // maxZoom: 13,
     zoom: 8
   });
   
