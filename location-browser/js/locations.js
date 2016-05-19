@@ -24,55 +24,54 @@ $(document).ready(function () {
 
     // setup the datatable 
     var table =  $("#locations").DataTable({
+        "columnDefs": [{
+            "targets": 1,
+            "visible": false }, 
+          {
+            "targets": 2,
+            "visible": false }],
         dom: 'ipt',   // hide default filter and length config
         scrollY: wh - (bodyOffset + filterHeight + headHeight ),
         paging: false
     });
   
-    main();
+    loadData();
 
-    function main(){
+    function loadData(){
 
-        var resolverURL = "//nominatim.openstreetmap.org/search?format=json&q=";
+        var namesRequest = $.getJSON( "data/cities.json", function( data ) { /* debug messages */ }); 
 
-        var data = []; // the ids coming back from serviceA
+        namesRequest.done(function() { // if "data/cities.json" were successfully loaded ...
 
-        var deferredA = $.getJSON( "data/cities.json", function( data ) { }); 
+            data = namesRequest.responseJSON; 
 
-        deferredA.done(function() { // if callToServiceA successful...
-
-            data = deferredA.responseJSON; 
-
-            var deferredBs = [];
+            var locationRequests = [];
 
             for(var i = 0; i < data.length; i++){
 
                 var city = data[i]; 
-                deferredBs.push(
+              
+                locationRequests.push(
 
-                    $.getJSON( resolverURL + city.name,  function( data ) {
-
-                    } )
+                    $.getJSON( resolverURL + city.name,  function( data ) { /* debug messages */ } )
                 );
             }
 
-            $.when.apply($, deferredBs).then(function() {
+            $.when.apply($, locationRequests).then(function() {
 
                 var markers = []; 
 
-                for (var i = 0; i < deferredBs.length; i++) {
-                    var location = deferredBs[i].responseJSON[0]; 
-                    console.log(location);
+                for (var i = 0; i < locationRequests.length; i++) {
+                    var location = locationRequests[i].responseJSON[0]; 
+
                     var marker = [location.display_name, location.lat, location.lon]; 
+                  
                     var row = {"0":location.display_name, "1":location.lat, "2": location.lon};
+                  
                     table.row.add(row);
-                    // markers.push(marker); 
                 }
               
                 table.draw(); 
-
-                // updateMarkers(markers); 
-                // map.fitBounds(locationLayer.getBounds());
 
             }); 
         });
@@ -109,8 +108,6 @@ $(document).ready(function () {
 
     // Redraw the map whenever the table is searched.
     table.on("search", function () {
-
-        console.log("search()");
 
         locations = table.rows({search: "applied"}).data();
       
@@ -161,9 +158,7 @@ $(document).ready(function () {
     var locations = [];
     var locationLayer = L.featureGroup([]);
     var map = L.map("map", {
-        // maxZoom: 15, 
-        center: [0, 0],
-        // maxZoom: 13,
+        center: [50, 13],
         zoom: 8
     });
   
@@ -200,9 +195,6 @@ $(document).ready(function () {
   
     /** update the location markers */
     function updateMarkers(locations) {
-
-        console.log("updateMarkers()");
-        console.log(locations.length); 
 
         var markers = [];
 
