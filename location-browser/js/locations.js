@@ -24,6 +24,9 @@ $(document).ready(function () {
 
     // setup the datatable 
     var table =  $("#locations").DataTable({
+        "language": {
+            "url": "js/dataTables/German.json"
+        },
         "columnDefs": [{
             "targets": 1,
             "visible": false }, 
