@@ -32,9 +32,6 @@ $(document).ready(function () {
         , "visible": false
       }
 
-
-
-
       
       , {
         "targets": 2
@@ -129,7 +126,7 @@ $(document).ready(function () {
     url: "data/countries.json"
   }).done(function (data) {
     console.log(data);
-    $("#methods").autocomplete({
+    $("#country").autocomplete({
       autoFocus: true
       , minLength: 0
       , source: $.map(data, function (value, key) {
@@ -140,8 +137,8 @@ $(document).ready(function () {
       })
       , select: function (event, ui) {
         event.preventDefault();
-        $("#methods").val(ui.item.label);
-        $("#methods").attr("data-value", ui.item.value);
+        $("#country").val(ui.item.label);
+        $("#country").attr("data-value", ui.item.value);
         table.search(ui.item.label).draw();
 
       }
@@ -151,15 +148,17 @@ $(document).ready(function () {
   // Redraw the map whenever the table is searched.
   table.on("search", function () {
 
-    // locations = table.rows({search: "applied"}).data();
+    locations = table.rows({
+      search: "applied"
+    }).data();
 
-    // updateMarkers(locations);
+    updateMarkers(locations);
 
     if (!considerBounds) {
 
       // when the search is initiated from the 
       // filter form, fit the map to found locations.
-      // map.fitBounds(locationLayer.getBounds());
+      map.fitBounds(locationLayer.getBounds());
 
     }
 
