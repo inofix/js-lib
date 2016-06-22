@@ -131,6 +131,21 @@
       if (e.layer instanceof L.Path) e.layer.on('dblclick', L.DomEvent.stop).on('dblclick', e.layer.toggleEdit);
     });
 
+
+    var clearLayers = function (e) {
+
+      console.log('clearLayers');
+
+      map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+        if (layer instanceof L.Path) {
+          map.removeLayer(layer);
+        }
+      })
+    };
+
     var updateCoordinates = function (e) {
       console.log('updateCoordinates');
 
@@ -162,7 +177,8 @@
       document.getElementById('coordinates').value = [55, 33];
     }
 
-    map.on('editable:drawing:end', updateCoordinates);
+    // map.on('editable:drawing:end', updateCoordinates);
+    map.on('editable:drawing:start', clearLayers);
 
 
     setTimeout(function () {
