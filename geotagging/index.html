@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="js/leaflet-1.0.0-rc1/leaflet.css" />
+  <style>
+    .map {
+      height: 70vh;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="map" class="map">
+  </div>
+  <form id="fm">
+    <label for="coordinates">Coordinates: </label>
+    <input id="coordinates" />
+  </form>
+
+  <script src="js/leaflet-1.0.0-rc1/leaflet.js"></script>
+
+  <script src="js/Leaflet.Editable.js"></script>
+  <script>
+    var berlin = [52.51733, 13.38886];
+
+    var tilesAttribution = '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors';
+
+    var tilesURL = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
+
+    var map = L.map('map', {
+        editable: true
+      }).setView(berlin, 16)
+      , tilelayer = L.tileLayer(tilesURL, {
+        maxZoom: 20
+        , attribution: tilesAttribution
+      }).addTo(map);
+
+    L.NewLineControl = L.Control.extend({
+
+      options: {
+        position: 'topleft'
+      },
+
+      onAdd: function (map) {
+        var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar')
+          , link = L.DomUtil.create('a', '', container);
+
+        link.href = '#';
+        link.title = 'Create a new line';
+        link.innerHTML = '/\\/';
+        L.DomEvent.on(link, 'click', L.DomEvent.stop)
+          .on(link, 'click', function () {
+            map.editTools.startPolyline();
+          });
+
+        return container;
+      }
+    });
+
+    L.NewPolygonControl = L.Control.extend({
+
+      options: {
+        position: 'topleft'
+      },
+
+      onAdd: function (map) {
+        var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar')
+          , link = L.DomUtil.create('a', '', container);
+
+        link.href = '#';
+        link.title = 'Create a new polygon';
+        link.innerHTML = '▱';
+        L.DomEvent.on(link, 'click', L.DomEvent.stop)
+          .on(link, 'click', function () {
+            map.editTools.startPolygon();
+          });
+
+        return container;
+      }
+    });
+
+    L.NewMarkerControl = L.Control.extend({
+
+      options: {
+        position: 'topleft'
+      },
+
+      onAdd: function (map) {
+        var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar')
+          , link = L.DomUtil.create('a', '', container);
+
+        link.href = '#';
+        link.title = 'Add a new marker';
+        link.innerHTML = '⚫';
+        L.DomEvent.on(link, 'click', L.DomEvent.stop)
+          .on(link, 'click', function () {
+            map.editTools.startMarker({
+              title: "foo"
+            });
+          });
+
+        return container;
+      }
+    });
+
+    map.addControl(new L.NewMarkerControl());
+    // map.addControl(new L.NewLineControl());
+    map.addControl(new L.NewPolygonControl());
+
+    var deleteShape = function (e) {
+      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
+        this.editor.deleteShapeAt(e.latlng);
+      }
+    };
+
+    var deleteMarker = function (e) {
+      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
+        map.removeLayer(this);
+      }
+    };
+
+    map.on('layeradd', function (e) {
+      if (e.layer instanceof L.Marker) {
+        e.layer.on('click', L.DomEvent.stop).on('click', deleteMarker, e.layer);
+      }
+      if (e.layer instanceof L.Path) {
+        e.layer.on('click', L.DomEvent.stop).on('click', deleteShape, e.layer);
+      }
+      if (e.layer instanceof L.Path) e.layer.on('dblclick', L.DomEvent.stop).on('dblclick', e.layer.toggleEdit);
+    });
+
+    var updateCoordinates = function (e) {
+      console.log('updateCoordinates');
+
+      var polygonMarkers = [];
+      var shapes = [];
+
+      map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker) {
+          console.log('L.Marker');
+          // console.log(layer.getLatLngs());
+          // console.log(layer.getLatLng());
+          // console.log(layer.toGeoJSON());
+        }
+        if (layer instanceof L.Path) {
+          console.log('L.Path');
+          // console.log(layer.getLatLngs());
+          polygonMarkers.push.apply(polygonMarkers, layer.getLatLngs()[0]);
+          shapes.push.apply(shapes, layer.getLatLngs());
+          // console.log(layer.getBounds());
+          // console.log(layer.toGeoJSON());
+        }
+      });
+
+      console.log(polygonMarkers.length);
+      console.log(shapes.length);
+
+      // console.log(polygonMarkers);
+
+      document.getElementById('coordinates').value = [55, 33];
+    }
+
+    map.on('editable:drawing:end', updateCoordinates);
+
+
+    setTimeout(function () {
+      map.invalidateSize();
+    }, 1000);
+  </script>
+</body>
+
+</html>
