@@ -15,8 +15,8 @@
   <div id="map" class="map">
   </div>
   <form id="fm">
-    <label for="coordinates">Coordinates: </label>
-    <input id="coordinates" />
+    <label for="geoJSON">GeoJSON: </label>
+    <textarea id="geoJSON"></textarea>
   </form>
 
   <script src="js/leaflet-1.0.0-rc1/leaflet.js"></script>
@@ -133,9 +133,6 @@
 
 
     var clearLayers = function (e) {
-
-      console.log('clearLayers');
-
       map.eachLayer(function (layer) {
         if (layer instanceof L.Marker) {
           map.removeLayer(layer);
@@ -147,37 +144,28 @@
     };
 
     var updateCoordinates = function (e) {
-      console.log('updateCoordinates');
 
-      var polygonMarkers = [];
-      var shapes = [];
+      var geoJSON = "";
 
-      map.eachLayer(function (layer) {
-        if (layer instanceof L.Marker) {
-          console.log('L.Marker');
-          // console.log(layer.getLatLngs());
-          // console.log(layer.getLatLng());
-          // console.log(layer.toGeoJSON());
-        }
-        if (layer instanceof L.Path) {
-          console.log('L.Path');
-          // console.log(layer.getLatLngs());
-          polygonMarkers.push.apply(polygonMarkers, layer.getLatLngs()[0]);
-          shapes.push.apply(shapes, layer.getLatLngs());
-          // console.log(layer.getBounds());
-          // console.log(layer.toGeoJSON());
-        }
-      });
+      if (e.layer instanceof L.Marker) {
+        geoJSON = e.layer.toGeoJSON();
+        console.log(geoJSON);
+      }
+      if (e.layer instanceof L.Path) {
+        geoJSON = e.layer.toGeoJSON();
+        console.log(geoJSON);
+      }
 
-      console.log(polygonMarkers.length);
-      console.log(shapes.length);
-
-      // console.log(polygonMarkers);
-
-      document.getElementById('coordinates').value = [55, 33];
+      document.getElementById('geoJSON').value = JSON.stringify(geoJSON);
     }
 
-    // map.on('editable:drawing:end', updateCoordinates);
+    var clearGeoJSON = function (e) {
+      console.log('clearGeoJSON');
+      document.getElementById('geoJSON').value = "";
+    }
+
+    map.on('editable:drawing:end', updateCoordinates);
+    map.on('editable:drawing:start', clearGeoJSON);
     map.on('editable:drawing:start', clearLayers);
 
 
