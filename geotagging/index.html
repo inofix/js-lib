@@ -23,20 +23,11 @@
 
   <script src="js/Leaflet.Editable.js"></script>
   <script>
-    var tilesAttribution = '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors';
-
-    var tilesURL = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
-
-
-    var zoom = 16;
-    if (getCookie('zoom') != "") {
-      zoom = getCookie('zoom');
-    }
-
     var center = [52.51733, 13.38886];
-    if (getCookie('center') != "") {
-      center = JSON.parse(getCookie('center'));
-    }
+    var geoJSON = {};
+    var tilesAttribution = '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors';
+    var tilesURL = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
+    var zoom = 16;
 
     var map = L.map('map', {
         editable: true
@@ -105,9 +96,7 @@
         link.innerHTML = '⚫';
         L.DomEvent.on(link, 'click', L.DomEvent.stop)
           .on(link, 'click', function () {
-            map.editTools.startMarker({
-              title: "foo"
-            });
+            map.editTools.startMarker({});
           });
 
         return container;
@@ -115,9 +104,39 @@
     });
 
     map.addControl(new L.NewMarkerControl());
-    // map.addControl(new L.NewLineControl());
+    map.addControl(new L.NewLineControl());
     map.addControl(new L.NewPolygonControl());
 
+    // restore previous map state
+    restore();
+
+
+    function clearGeoJSON() {
+      document.getElementById('geoJSON').value = "";
+    }
+
+    function clearLayers() {
+      map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+        if (layer instanceof L.Path) {
+          map.removeLayer(layer);
+        }
+      })
+    };
+
+    function deleteMarker(e) {
+      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
+        map.removeLayer(this);
+      }
+    };
+
+    function deleteShape(e) {
+      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
+        this.editor.deleteShapeAt(e.latlng);
+      }
+    };
 
     function getCookie(cname) {
 
@@ -135,6 +154,79 @@
       return "";
     }
 
+    function restore() {
+
+      if (getCookie('center') != "") {
+        center = JSON.parse(getCookie('center'));
+      }
+
+      if (getCookie('geojson') != "") {
+
+        geoJSON = JSON.parse(getCookie('geojson'));
+        document.getElementById('geoJSON').value = JSON.stringify(geoJSON);
+
+        var coordinates = geoJSON.geometry.coordinates;
+
+        if (geoJSON.geometry.type == 'LineString') {
+
+          var latLngs = [];
+
+          // coords in geojson are stored as [longitude,latitude]
+          // as opposed to leaflet, which expects points in as
+          // [latitude, longitude] array.
+          for (i = 0; i < coordinates.length; i++) {
+            var latLng = [];
+            latLng[0] = coordinates[i][1];
+            latLng[1] = coordinates[i][0];
+            latLngs.push(latLng);
+          }
+
+          var polyline = L.polyline(latLngs).addTo(map);
+          polyline.enableEdit();
+
+        }
+
+        if (geoJSON.geometry.type == 'Point') {
+
+          // coords in geojson are stored as [longitude,latitude]
+          // as opposed to leaflet, which expects points in as
+          // [latitude, longitude] array.
+          var latLng = [];
+
+          latLng[0] = coordinates[1];
+          latLng[1] = coordinates[0];
+
+          var marker = L.marker(latLng).addTo(map);
+          marker.enableEdit();
+
+        }
+        if (geoJSON.geometry.type == 'Polygon') {
+
+          var latLngs = [];
+
+          // coords in geojson are stored as [longitude,latitude]
+          // as opposed to leaflet, which expects points in as
+          // [latitude, longitude] array.
+          for (i = 0; i < coordinates[0].length; i++) {
+            var latLng = [];
+            latLng[0] = coordinates[0][i][1];
+            latLng[1] = coordinates[0][i][0];
+            latLngs.push(latLng);
+          }
+
+          var polygon = L.polygon(latLngs).addTo(map);
+          polygon.enableEdit();
+
+        }
+
+        if (getCookie('zoom') != "") {
+          zoom = getCookie('zoom');
+        }
+
+        map.setView(center, zoom);
+      }
+    }
+
     function setCookie(cname, cvalue, exdays) {
 
       var d = new Date();
@@ -144,36 +236,7 @@
 
     }
 
-    var clearGeoJSON = function (e) {
-      document.getElementById('geoJSON').value = "";
-    }
-
-    var clearLayers = function (e) {
-      map.eachLayer(function (layer) {
-        if (layer instanceof L.Marker) {
-          map.removeLayer(layer);
-        }
-        if (layer instanceof L.Path) {
-          map.removeLayer(layer);
-        }
-      })
-    };
-
-    var deleteMarker = function (e) {
-      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
-        map.removeLayer(this);
-      }
-    };
-
-    var deleteShape = function (e) {
-      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
-        this.editor.deleteShapeAt(e.latlng);
-      }
-    };
-
-    var updateCoordinates = function (e) {
-
-      var geoJSON = "";
+    function updateGeoJSON(e) {
 
       if (e.layer instanceof L.Marker) {
         geoJSON = e.layer.toGeoJSON();
@@ -183,9 +246,11 @@
       }
 
       document.getElementById('geoJSON').value = JSON.stringify(geoJSON);
+
+      setCookie('geojson', JSON.stringify(geoJSON), 365);
     }
 
-    map.on('editable:drawing:end', updateCoordinates);
+    map.on('editable:drawing:end', updateGeoJSON);
     map.on('editable:drawing:start', clearGeoJSON);
     map.on('editable:drawing:start', clearLayers);
 
@@ -200,7 +265,6 @@
     });
 
     map.on('zoomend', function (e) {
-      // console.log(map.getZoom());
       setCookie('zoom', map.getZoom(), 365);
     });
 
