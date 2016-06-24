@@ -23,15 +23,24 @@
 
   <script src="js/Leaflet.Editable.js"></script>
   <script>
-    var berlin = [52.51733, 13.38886];
-
     var tilesAttribution = '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors';
 
     var tilesURL = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
 
+
+    var zoom = 16;
+    if (getCookie('zoom') != "") {
+      zoom = getCookie('zoom');
+    }
+
+    var center = [52.51733, 13.38886];
+    if (getCookie('center') != "") {
+      center = JSON.parse(getCookie('center'));
+    }
+
     var map = L.map('map', {
         editable: true
-      }).setView(berlin, 16)
+      }).setView(center, zoom)
       , tilelayer = L.tileLayer(tilesURL, {
         maxZoom: 20
         , attribution: tilesAttribution
@@ -109,28 +118,35 @@
     // map.addControl(new L.NewLineControl());
     map.addControl(new L.NewPolygonControl());
 
-    var deleteShape = function (e) {
-      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
-        this.editor.deleteShapeAt(e.latlng);
-      }
-    };
 
-    var deleteMarker = function (e) {
-      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
-        map.removeLayer(this);
-      }
-    };
+    function getCookie(cname) {
 
-    map.on('layeradd', function (e) {
-      if (e.layer instanceof L.Marker) {
-        e.layer.on('click', L.DomEvent.stop).on('click', deleteMarker, e.layer);
+      var name = cname + "=";
+      var ca = document.cookie.split(';');
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
       }
-      if (e.layer instanceof L.Path) {
-        e.layer.on('click', L.DomEvent.stop).on('click', deleteShape, e.layer);
-      }
-      if (e.layer instanceof L.Path) e.layer.on('dblclick', L.DomEvent.stop).on('dblclick', e.layer.toggleEdit);
-    });
+      return "";
+    }
 
+    function setCookie(cname, cvalue, exdays) {
+
+      var d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      var expires = "expires=" + d.toUTCString();
+      document.cookie = cname + "=" + cvalue + "; " + expires;
+
+    }
+
+    var clearGeoJSON = function (e) {
+      document.getElementById('geoJSON').value = "";
+    }
 
     var clearLayers = function (e) {
       map.eachLayer(function (layer) {
@@ -143,31 +159,54 @@
       })
     };
 
+    var deleteMarker = function (e) {
+      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
+        map.removeLayer(this);
+      }
+    };
+
+    var deleteShape = function (e) {
+      if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
+        this.editor.deleteShapeAt(e.latlng);
+      }
+    };
+
     var updateCoordinates = function (e) {
 
       var geoJSON = "";
 
       if (e.layer instanceof L.Marker) {
         geoJSON = e.layer.toGeoJSON();
-        console.log(geoJSON);
       }
       if (e.layer instanceof L.Path) {
         geoJSON = e.layer.toGeoJSON();
-        console.log(geoJSON);
       }
 
       document.getElementById('geoJSON').value = JSON.stringify(geoJSON);
-    }
-
-    var clearGeoJSON = function (e) {
-      console.log('clearGeoJSON');
-      document.getElementById('geoJSON').value = "";
     }
 
     map.on('editable:drawing:end', updateCoordinates);
     map.on('editable:drawing:start', clearGeoJSON);
     map.on('editable:drawing:start', clearLayers);
 
+    map.on('layeradd', function (e) {
+      if (e.layer instanceof L.Marker) {
+        e.layer.on('click', L.DomEvent.stop).on('click', deleteMarker, e.layer);
+      }
+      if (e.layer instanceof L.Path) {
+        e.layer.on('click', L.DomEvent.stop).on('click', deleteShape, e.layer);
+      }
+      if (e.layer instanceof L.Path) e.layer.on('dblclick', L.DomEvent.stop).on('dblclick', e.layer.toggleEdit);
+    });
+
+    map.on('zoomend', function (e) {
+      // console.log(map.getZoom());
+      setCookie('zoom', map.getZoom(), 365);
+    });
+
+    map.on('dragend', function (e) {
+      setCookie('center', JSON.stringify(map.getCenter()), 365);
+    })
 
     setTimeout(function () {
       map.invalidateSize();
