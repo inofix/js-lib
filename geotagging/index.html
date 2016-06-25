@@ -251,8 +251,10 @@
     }
 
     map.on('editable:drawing:end', updateGeoJSON);
+    map.on('editable:drawing:move', updateGeoJSON);
     map.on('editable:drawing:start', clearGeoJSON);
     map.on('editable:drawing:start', clearLayers);
+    map.on('editable:vertex:dragend', updateGeoJSON);
 
     map.on('layeradd', function (e) {
       if (e.layer instanceof L.Marker) {
