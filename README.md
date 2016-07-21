@@ -27,6 +27,10 @@ modal slider uses bootstrap's modal dialog to present a flexslider based carouse
  * <code>npm install grunt-contrib-qunit --save-dev</code>
  * <code>npm install grunt-contrib-uglify --save-dev</code>
  * <code>npm install grunt-contrib-watch --save-dev</code>
+* install configured bower dependencies:
+ * <code>bower install</code>
+* concat und minify used libraries by running grunt's default task: 
+ * <code>grunt</code>
 
 
 ## Used libraries
