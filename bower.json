@@ -1,0 +1,21 @@
+{
+  "name": "marker-cluster",
+  "description": "A marker cluster demo",
+  "main": "index.js",
+  "authors": [
+    "Christian Berndt"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/chrberndt/js-lib",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "leaflet": "^1.0.0",
+    "leaflet.markercluster": "git://github.com/Leaflet/Leaflet.markercluster.git#v1.0.0-rc.1"
+  }
+}
