@@ -6,15 +6,34 @@ js-lib bundles frequently used js-libraries
 
 js-lib bundles frequently used js-libraries in a form which makes them easy accessible from our portlet projects.
 
-## location-browser
+## Subprojects
+
+### location-browser
 
 location-browser combines the DataTable plugin for jQuery with the leaflet map library in a bootstrap 2.3.2 layout.
 
-## modal-slider
+### modal-slider
 
 modal slider uses bootstrap's modal dialog to present a flexslider based carousel.
 
-## used libraries
+## Project Setup
+
+* clone repo
+* install grunt and required tasks: 
+ * <code>npm install grunt --save-dev</code>
+ * <code>npm install grunt-bower-concat --save-dev</code>
+ * <code>npm install grunt-contrib-cssmin --save-dev</code>
+ * <code>npm install grunt-contrib-jshint --save-dev</code>
+ * <code>npm install grunt-contrib-qunit --save-dev</code>
+ * <code>npm install grunt-contrib-uglify --save-dev</code>
+ * <code>npm install grunt-contrib-watch --save-dev</code>
+* install configured bower dependencies:
+ * <code>bower install</code>
+* concat und minify used libraries by running grunt's default task: 
+ * <code>grunt</code>
+
+
+## Used libraries
 
 * leaflet from <a href="http://leafletjs.com/" target="_blank">http://leafletjs.com<a>
 * DataTables from <a href="https://www.datatables.net" target="_blank">https://www.datatables.net</a>
