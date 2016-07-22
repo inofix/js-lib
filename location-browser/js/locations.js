@@ -236,8 +236,22 @@ $(document).ready(function () {
 
   /** update the location markers */
   function updateMarkers(locations) {
+    
+    var markers = L.markerClusterGroup();
+		
+		for (var i = 0; i < locations.length; i++) {
+      var lat = parseFloat(locations[i][1]);
+      var lon = parseFloat(locations[i][2]);
+      var title = lon;
+			var marker = L.marker(new L.LatLng(lat, lon), { title: title });
+			// marker.bindPopup(title);
+			markers.addLayer(marker);
+		}
 
-    var markers = [];
+		map.addLayer(markers);
+    map.fitBounds(markers.getBounds()); 
+    
+/*    var markers = [];
 
     for (var i = 0; i < locations.length; i++) {
 
@@ -257,7 +271,9 @@ $(document).ready(function () {
     if (markers.length > 0) {
       locationLayer = L.featureGroup(markers);
       locationLayer.addTo(map);
-    }
+    }*/
+    
+    
   }
 
 });
